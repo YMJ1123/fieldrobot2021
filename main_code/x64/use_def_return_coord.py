@@ -38,7 +38,11 @@ def readlabel2txt(path=""):
     
 
 #下麵是通過檢測獲取坐標的函數
-def coordinate_get(img):
+def coordinate_get(img,path=''):
+    
+    weightsPath = path+'custom-yolov4-tiny-detector_best.weights'
+    configPath = path+'cfg/custom-yolov4-tiny-detector.cfg'
+    labelsPath = path+'cfg/obj.names'
     
     net = cv2.dnn.readNetFromDarknet(configPath, weightsPath)
     net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
@@ -104,6 +108,9 @@ def draw_boxes(detections, image, colors,label2txt):
                     colors[label], 2)
     return image
 
+def return_coord(frame,path=''):
+    
+    return coordinate_get(frame,path)
 
 
 if __name__ == '__main__':

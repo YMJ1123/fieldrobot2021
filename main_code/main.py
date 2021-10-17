@@ -29,14 +29,15 @@ isconfidence=0.8 #設定看到多少的信心算是有看到
 
 if __name__=='__main__':
     
-    step=4
+    step=5
     prefix_path='x64/'
     
     # step1 會用到的變數
     # smooth 變數
     coord_smooth_list=[]
-    mostlikely_smooth=None
-    smooth_num=5
+    # mostlikely_smooth=None
+    mostlikely_smooth=2
+    smooth_num=3
     
     # step2會用到的變數
     nofruit=0
@@ -219,7 +220,7 @@ if __name__=='__main__':
             use_darknet.draw_boxes([[coord,mostlikely,theconfidence]], frame_draw, colors,label2txt)   
             cv2.putText(frame_draw, 'smoothed', (10, 40), cv2.FONT_HERSHEY_SIMPLEX,1, (0, 255, 255), 1, cv2.LINE_AA)
             print('smoothed')
-            cv2.imshow('live2', frame_draw)
+            cv2.imshow('live', frame_draw)
             
             if mostlikely==None:#沒偵測到水果
                 nofruit+=1
@@ -232,7 +233,7 @@ if __name__=='__main__':
             
             print(coord)
             
-            errpix=10 #可容許的對位誤差
+            errpix=30 #可容許的對位誤差
             inmiddle=False
             
             if abs((coord[0]+coord[2])/2-w/2)<errpix: #這樣算是有對齊
@@ -306,9 +307,7 @@ if __name__=='__main__':
                     mostlikely=coordinate_set[1]
             
             use_darknet.draw_boxes([[coord,mostlikely,theconfidence]], frame_draw, colors,label2txt)   
-            cv2.putText(frame_draw, 'smoothed', (10, 40), cv2.FONT_HERSHEY_SIMPLEX,1, (0, 255, 255), 1, cv2.LINE_AA)
-            print('smoothed')
-            cv2.imshow('live2', frame_draw)
+            cv2.imshow('live', frame_draw)
             
             if mostlikely==None:#沒偵測到水果
                 nofruit+=1
@@ -374,6 +373,7 @@ if __name__=='__main__':
         elif step ==4:
             print('in step 4')
             # 跟arduino說現在是step幾
+            
             try:
                 b='0110000'
                 success_bytes=ser.write(b.encode(encoding='UTF-8'))
@@ -383,9 +383,25 @@ if __name__=='__main__':
                 ser.close()    # 清除序列通訊物件
                 print('Failed to send')
             
+            # 還是讀一下圖片
+            
+            coordinates_list=use_darknet.return_coord(frame,path=prefix_path) #取得座標
+            isfruit=False
+            mostlikely=None
+            theconfidence=0 #信心
+            coord=[0,0,0,0] #儲存的座標 [xmin,ymin,xmax,ymax]
+            for coordinate_set in coordinates_list: # 取信心最大
+                if coordinate_set[2]>isconfidence and coordinate_set[2]>theconfidence:
+                    theconfidence=coordinate_set[2]
+                    coord=coordinate_set[0]
+                    mostlikely=coordinate_set[1]
+            
+            use_darknet.draw_boxes([[coord,mostlikely,theconfidence]], frame_draw, colors,label2txt)   
+            cv2.imshow('live', frame_draw)
+            
             #TODO Arduio合上夾爪，從Arduino讀值(微動開關碰到發訊息，夾爪完全閉合但微動開關未通電也會發訊息)
             
-
+            
             msg=ser.readline()
             msg=msg.decode('utf-8')
             print(msg)
@@ -419,26 +435,52 @@ if __name__=='__main__':
                 print('Failed to send')
             # 執行循線code，同時camera偵測(同時分開進行)
             
+            # frame->(480, 640, 3)
+            
             #偵測箱子應該是用inRange()
             hsv=cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
             lower_mask = np.array([0,0,0]) 
             upper_mask = np.array([0,0,0]) 
+            
             if mostlikely_smooth==0:
                 #TODO 找Range值 carrot 指定mask
+                lower_mask = np.array([0,0,0]) 
+                upper_mask = np.array([0,0,0]) 
                 pass
             elif mostlikely_smooth==1:
                 #TODO 找Range值 tomato 指定mask
+                lower_mask = np.array([0,175,45]) 
+                upper_mask = np.array([20,255,176]) 
                 pass
             elif mostlikely_smooth==2:
                 #TODO 找Range值 lemon 指定mask
+                lower_mask = np.array([43,64,71]) 
+                upper_mask = np.array([67,212,175]) 
                 pass
             elif mostlikely_smooth==3:
                 #TODO 找Range值 avocado 指定mask
+                lower_mask = np.array([95,89,84]) 
+                upper_mask = np.array([118,209,178]) 
                 pass
             else:
                 # 沒有東西就開過去
                 pass
+            
             seebox=False
+            boxinmiddle=False
+            
+            mask = cv2.inRange(hsv, lower_mask, upper_mask) 
+            area=0
+            numlist=mask.copy()
+        
+            
+            for number in numlist:
+                area += number/255
+            # print(area)
+            cv2.imshow('hsv',mask)
+            # 使用inRange，理想情況是先匡出矩形區域，再算面積
+            # 但我快死掉了，所以就先只看面積
+
             
             
             if '''#TODO 箱子面積>閾值''':
