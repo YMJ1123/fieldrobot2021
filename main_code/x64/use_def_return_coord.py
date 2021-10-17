@@ -13,6 +13,29 @@ import random
 
 #使用opencv加載Darknet模型
 
+def readlabel2txt(path=""):
+    weightsPath = path+'custom-yolov4-tiny-detector_best.weights'
+    configPath = path+'cfg/custom-yolov4-tiny-detector.cfg'
+    labelsPath = path+'cfg/obj.names'
+    colors=[]
+    label2txt = []
+    f = open(labelsPath, 'r')
+    for line in f.readlines():
+        line=line.strip('\n')
+        label2txt.append(line)
+        if line=="avocado":
+            colors.append((11,23,70))
+        elif line=="carrot":
+            colors.append((199,97,20))
+        elif line =="lemon":
+            colors.append((34,139,34))
+        elif line =="tomato":
+            colors.append((0,0,255))
+        else:
+            colors.append((random.randrange(255),random.randrange(255),random.randrange(255)))
+    f.close()
+    return label2txt,colors
+    
 
 #下麵是通過檢測獲取坐標的函數
 def coordinate_get(img):
