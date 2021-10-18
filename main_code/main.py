@@ -1,6 +1,7 @@
 
 import cv2
 import ipdb
+from ipdb.__main__ import set_trace
 import numpy
 import serial  # 引用pySerial模組
 import time
@@ -466,25 +467,24 @@ if __name__=='__main__':
                 # 沒有東西就開過去
                 pass
             
-            seebox=False
             boxinmiddle=False
+            area_threshold=30000
             
             mask = cv2.inRange(hsv, lower_mask, upper_mask) 
+            canny=cv2.Canny(mask,100,200)
             area=0
-            numlist=mask.copy()
-        
-            
-            for number in numlist:
-                area += number/255
-            # print(area)
+            contours,hierarchy=cv2.findContours(canny,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
+            for cnt in contours:
+                area+=cv2.contourArea(cnt)
+            print(area)
             cv2.imshow('hsv',mask)
             # 使用inRange，理想情況是先匡出矩形區域，再算面積
             # 但我快死掉了，所以就先只看面積
 
             
             
-            if '''#TODO 箱子面積>閾值''':
-                seebox=True
+            if area>area_threshold:#當箱子面積>閾值
+                
                 try:
                     b='1000001' #告訴Arduino該慢下來了喔
                     success_bytes=ser.write(b.encode(encoding='UTF-8'))
@@ -494,14 +494,14 @@ if __name__=='__main__':
                     ser.close()    # 清除序列通訊物件
                     print('Failed to send')
                 # 開始慢慢開
-            
-        
-            if boxinmiddle: # YOLO 偵測到箱子
+                
                 step=6
                 pass
-            pass
+                
+            
         
         elif step ==6:
+            # 這是一個慢慢開的狀態
             print('in step 6')
             # 跟arduino說現在是step幾
             try:
@@ -535,6 +535,7 @@ if __name__=='__main__':
         elif step ==7:
             print('in step 7')
             # 跟arduino說現在是step幾
+            # 應該是停車的狀態
             try:
                 b='1100000'
                 success_bytes=ser.write(b.encode(encoding='UTF-8'))
@@ -543,14 +544,27 @@ if __name__=='__main__':
             except KeyboardInterrupt:
                 ser.close()    # 清除序列通訊物件
                 print('Failed to send')
-            #TODO 夾爪降下來一點，跟Arduino說可以放開夾爪(放開那女孩!!)
+            #TODO 夾爪降下來一點，跟Arduino說可以放開夾爪
             
-            if '''#TODO 夾爪張到最開&&微動開關沒感應''':
-                step=8
-            pass
+            msg=ser.readline()
+            msg=msg.decode('utf-8')
+            print(msg)
+            try:
+
+                msg=int(msg)
+                print(msg)
+                if msg==0: #微動開關OFF(代表有已經丟下來了)
+                    # 夾到了
+                    step=8
+
+                if  msg==2: #已經張到最開             
+                    step=8 #退回調整手臂
+            except:
+                pass
+            
         
         elif step ==8:
-            print('in step 7')
+            print('in step 8')
             # 跟arduino說現在是step幾
             try:
                 b='1110000'

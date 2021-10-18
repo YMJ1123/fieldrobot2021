@@ -34,6 +34,10 @@ step=6
 
 step=7
 1100000
+arduino->python
+0 微動開關OFF
+1 微動開關ON
+2 已經張到最開
 
 step=8
 1110000

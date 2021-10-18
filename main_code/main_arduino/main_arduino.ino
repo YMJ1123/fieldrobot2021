@@ -180,7 +180,7 @@ void loop()
           lcd.setCursor(0, 1); // 設定游標位置在第2行行首
           lcd.print('1');
         }
-        int limit_angle=0; //TODO 設定極限角度，要量一下
+        int limit_angle=0; //TODO 設定閉最緊的極限角度，要量一下
         if(d_servo2==limit_angle){ //也是沒夾到
           Serial.println('2');
           lcd.setCursor(0, 1); // 設定游標位置在第一行行首
@@ -198,13 +198,43 @@ void loop()
       else if(step==6){
         if(motion==1){
           //TODO 車停下來
+          // 先降一下夾爪(剛剛夾到東西時有升一點)
+          d_servo3=d_servo3-s;
+          servo3.write(d_servo3);
         }
       }
       else if(step==7){
+        // TODO 這裡車應該是停止的狀態
+        
+        //TODO 張開夾爪
+        d_servo2=d_servo2+s;// TODO 不確定是不是對的
+        servo2.write(d_servo2);
+
+        if(digitalRead(microswitch1)==HIGH || digitalRead(microswitch2)==HIGH){ //碰到微動開關
+          //TODO 這裡要傳訊息給python
+          Serial.println('1');//還沒掉下來
+          lcd.setCursor(0, 1); // 設定游標位置在第2行行首
+          lcd.print('1');
+
+
+        }else{
+          Serial.println('0');//沒有夾到東西->已經掉下來了
+          lcd.setCursor(0, 1); // 設定游標位置在第2行行首
+          lcd.print('0');
+        }
+        int limit_angle=0; //TODO 設定張最開的極限角度，要量一下
+        if(d_servo2==limit_angle){ //已經張最開，代表應該是掉下來了
+          Serial.println('2');
+          lcd.setCursor(0, 1); // 設定游標位置在第一行行首
+          lcd.print('2');
+          
+        }
 
       }
       else if(step==8){
-
+        // TODO 直走直到障礙
+        if (/*TODO DMS | 超音波感測到*/):
+          // TODO 停下來，結束程式
       }
       
 
