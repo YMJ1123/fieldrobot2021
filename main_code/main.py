@@ -47,7 +47,7 @@ if __name__=='__main__':
     label2txt,colors=use_darknet.readlabel2txt(path=prefix_path)
     
     # pyserial 連線
-    COM_PORT = 'COM4'    # 指定通訊埠名稱
+    COM_PORT = '/dev/ttyUSB1'    # 指定通訊埠名稱
     BAUD_RATES = 38400    # 設定傳輸速率
     locations=['COM0','COM1','COM2','COM3','COM4','COM5','COM6']
     # location=['/dev/ttyUSB0','/dev/ttyUSB1','/dev/ttyUSB2','/dev/ttyUSB3','/dev/ttyS0','/dev/ttyS1','/dev/ttyS2','/dev/ttyS3'] #linux
