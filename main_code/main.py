@@ -30,7 +30,7 @@ isconfidence=0.8 #設定看到多少的信心算是有看到
 
 if __name__=='__main__':
     
-    step=5
+    step=1
     prefix_path='x64/'
     
     # step1 會用到的變數
@@ -51,6 +51,8 @@ if __name__=='__main__':
     BAUD_RATES = 38400    # 設定傳輸速率
     locations=['COM0','COM1','COM2','COM3','COM4','COM5','COM6']
     # location=['/dev/ttyUSB0','/dev/ttyUSB1','/dev/ttyUSB2','/dev/ttyUSB3','/dev/ttyS0','/dev/ttyS1','/dev/ttyS2','/dev/ttyS3'] #linux
+    ser = serial.Serial(COM_PORT, BAUD_RATES)
+    
     try:
         ser = serial.Serial(COM_PORT, BAUD_RATES)   # 初始化序列通訊埠
     except:

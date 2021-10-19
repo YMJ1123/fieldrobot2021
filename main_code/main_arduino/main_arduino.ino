@@ -17,6 +17,14 @@ int motion;
 int microswitch1 = 6;
 int microswitch2 = 7;
 
+const int RGBLED_R=0;
+const int RGBLED_G=1;
+const int RGBLED_B=2;
+
+const int left_motor=6;
+const int right_motor=7;
+// 77/80
+
 //手臂的初始角度
 int d_servo1 = 45; // 上下
 int d_servo2 = 180; //開合
@@ -31,6 +39,10 @@ char serialBuffer[bufferLength];// 建立字符数组用于缓存
 
 void setup()
 {
+  pinMode(RGBLED_R, OUTPUT);
+  pinMode(RGBLED_G, OUTPUT);
+  pinMode(RGBLED_B, OUTPUT);
+
   Serial.begin(38400);
   Serial.print("Program Initiate\n");
   pinMode(pinLED, OUTPUT); // 設定腳位 13 為輸出模式
@@ -233,8 +245,8 @@ void loop()
       }
       else if(step==8){
         // TODO 直走直到障礙
-        if (/*TODO DMS | 超音波感測到*/):
-          // TODO 停下來，結束程式
+//        if (/*TODO DMS | 超音波感測到*/):
+//          // TODO 停下來，結束程式
       }
       
 
